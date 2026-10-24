@@ -1,0 +1,462 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Ajzenk SEO audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: single column, 68ch measure, full-width bands for the three turning points */
+  :root {
+    --bg: #faf8f6;
+    --surface: #ffffff;
+    --fg: #241e26;
+    --muted: #6b6270;
+    --line: #e2dbe2;
+    --accent: #5b1865;
+    --accent-soft: #f3ecf4;
+    --warn: #9a4a12;
+    --good: #2f6b4f;
+    --display: "Spectral", Georgia, "Times New Roman", serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17131a;
+      --surface: #1f1a22;
+      --fg: #ece7ee;
+      --muted: #a79cab;
+      --line: #342c38;
+      --accent: #d8a7e2;
+      --accent-soft: #2a2130;
+      --warn: #e3a66e;
+      --good: #85c8a6;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17131a;
+    --surface: #1f1a22;
+    --fg: #ece7ee;
+    --muted: #a79cab;
+    --line: #342c38;
+    --accent: #d8a7e2;
+    --accent-soft: #2a2130;
+    --warn: #e3a66e;
+    --good: #85c8a6;
+    color-scheme: dark;
+  }
+
+  body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.62; }
+  .wrap { max-width: 50rem; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 2.5rem 4rem; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; line-height: 1.22; margin: 0; }
+  h1 { font-size: clamp(1.9rem, 6vw, 2.9rem); letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.35rem, 4.2vw, 1.75rem); margin-top: 3.2rem; padding-top: 1.4rem; border-top: 2px solid var(--accent); }
+  h3 { font-size: 1.08rem; margin-top: 1.9rem; font-family: var(--body); font-weight: 600; }
+  p, ul, ol { margin: 0.9rem 0; }
+  ul, ol { padding-left: 1.2rem; }
+  li { margin: 0.35rem 0; }
+  a { color: var(--accent); }
+  .eyebrow { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); font-weight: 600; margin-bottom: 0.7rem; }
+  .lede { font-family: var(--display); font-size: 1.16rem; color: var(--muted); margin-top: 1rem; }
+  .meta { font-size: 0.82rem; color: var(--muted); border-top: 1px solid var(--line); margin-top: 1.6rem; padding-top: 0.8rem; }
+
+  .verdict { background: var(--accent-soft); border-left: 4px solid var(--accent); padding: 1.1rem 1.2rem; margin: 1.6rem 0; }
+  .verdict p { margin: 0.4rem 0; }
+  .verdict strong { font-weight: 600; }
+
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin: 1.8rem 0; }
+  .fact { background: var(--surface); padding: 0.95rem 1rem; min-width: 0; }
+  .fact .n { font-family: var(--display); font-size: 1.7rem; font-variant-numeric: tabular-nums; display: block; }
+  .fact .l { font-size: 0.78rem; color: var(--muted); display: block; margin-top: 0.15rem; }
+
+  .scroll { overflow-x: auto; margin: 1.3rem 0; border: 1px solid var(--line); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--accent-soft); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  td:first-child { font-weight: 500; }
+  tbody tr:last-child td { border-bottom: 0; }
+
+  .pill { display: inline-block; font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; padding: 0.1rem 0.45rem; border: 1px solid currentColor; white-space: nowrap; }
+  .p1 { color: #a01b2b; } .p2 { color: var(--warn); } .p3 { color: var(--muted); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .p1 { color: #f09098; } }
+  :root[data-theme="dark"] .p1 { color: #f09098; }
+
+  .note { border: 1px solid var(--line); background: var(--surface); padding: 1rem 1.1rem; margin: 1.4rem 0; font-size: 0.93rem; }
+  .note h3 { margin-top: 0; }
+  .quote { font-family: var(--display); font-style: italic; color: var(--muted); border-left: 2px solid var(--line); padding-left: 1rem; margin: 1.3rem 0; }
+  .gain { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); margin: 1.5rem 0; }
+  .gain > div { background: var(--surface); padding: 1rem 1.1rem; }
+  .gain h3 { margin-top: 0; color: var(--accent); }
+  .gain p { margin: 0.45rem 0 0; font-size: 0.93rem; }
+  code { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: 0.86em; background: var(--accent-soft); padding: 0.08em 0.3em; }
+  footer { margin-top: 3.5rem; border-top: 1px solid var(--line); padding-top: 1.2rem; font-size: 0.84rem; color: var(--muted); }
+</style>
+
+<div class="wrap">
+
+  <p class="eyebrow">SEO audit &middot; oktobar 2026</p>
+  <h1>psihologbeograd.com</h1>
+  <p class="lede">Centar za lični rast i razvoj &mdash; AJZENK PR. Šta sajt danas radi za vas, šta ne radi, i šta se od toga može uraditi u prva tri meseca.</p>
+  <p class="meta">Analizirano: sadržaj sajta, tehnička postavka, Google poslovni profil, četiri direktna konkurenta i njihove cene. Podaci prikupljeni 23. oktobra 2026.</p>
+
+  <div class="verdict">
+    <p><strong>Kratak zaključak.</strong> Sajt nije pokvaren i nije kažnjen. On je vizit-karta: jedna strana, oko 185 reči teksta. Za Google to je premalo da bi se uopšte takmičio za bilo koju pretragu osim vašeg imena.</p>
+    <p>Čovek koji u Beogradu traži psihologa ne traži vas po imenu &mdash; on kuca „psiholog Beograd“, „psiholog za anksioznost“, „savetovanje parova cena“. Na tim pretragama vas trenutno nema, jer na sajtu ne postoji nijedna strana koja na to odgovara.</p>
+    <p>To je dobra vest u jednom smislu: ne treba ništa popravljati, treba dograditi. Sajt kreće sa čiste osnove, bez nasleđenih kazni i bez starog balasta.</p>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><span class="n">1</span><span class="l">strana na sajtu</span></div>
+    <div class="fact"><span class="n">185</span><span class="l">reči ukupnog teksta</span></div>
+    <div class="fact"><span class="n">0</span><span class="l">strana za usluge</span></div>
+    <div class="fact"><span class="n">3</span><span class="l">Google recenzije</span></div>
+  </div>
+
+  <h2>1. Šta sajt danas jeste</h2>
+
+  <p>Jedna HTML strana sa logom, kratkom biografijom, spiskom od deset oblasti rada i adresom. Kontakt ide preko telefona i Viber linka. Nema forme za zakazivanje, nema cena, nema bloga, nema nijedne podstrane.</p>
+
+  <p>Deset usluga je nabrojano u jednoj listi &mdash; od prevazilaženja napada panike do pripreme za intervju za posao. Svaka od tih deset stavki je zasebna pretraga koju ljudi zaista kucaju u Google, i svaka bi trebalo da ima svoju stranu. Trenutno su sve zbijene u nekoliko redova na početnoj, pa Google nema šta da rangira.</p>
+
+  <p>Još nekoliko stvari koje smo primetili na samoj strani:</p>
+  <ul>
+    <li>Na mestu vaše fotografije stoji isti fajl kao logo (<code>ms-icon-310x310.png</code>). Posetilac ne vidi vaše lice. Kod izbora psihologa to je jedan od najvažnijih elemenata poverenja.</li>
+    <li>Nema nijedne fotografije savetovališta &mdash; prostorije, stolica, ulaza u zgradu.</li>
+    <li>Nema nijedne recenzije ili iskustva klijenta na sajtu, iako ih na Google profilu imate.</li>
+    <li>Nema broja licence za obavljanje psihološke delatnosti. Zakon o uslovima za obavljanje psihološke delatnosti je uveo licenciranje; ako licencu imate, njen broj na sajtu odmah razdvaja vas od desetina „lajf koučeva“ koji se reklamiraju u istoj niši.</li>
+    <li>Nema podatka šta seansa košta ni koliko traje u ciklusu. Trajanje od sat vremena piše, cena ne.</li>
+  </ul>
+
+  <h2>2. Tehnički nalazi</h2>
+
+  <p>Lista je kratka jer je i sajt kratak. Nijedan od ovih problema nije skup za ispravku, ali prva tri utiču na to da li vas Google uopšte uredno indeksira.</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>Nalaz</th><th>Zašto je važno</th><th>Šta uraditi</th><th>Prioritet</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nema <code>sitemap.xml</code></td>
+          <td>Google nema mapu sajta. Sa jednom stranom to se još i oprašta; čim sajt naraste na 20 strana, bez mape se indeksiranje oteže.</td>
+          <td>Generisati mapu i prijaviti je u Search Console.</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td>Nema <code>robots.txt</code></td>
+          <td>Nedostaje osnovno uputstvo za pretraživače i link ka mapi sajta.</td>
+          <td>Postaviti minimalni robots.txt sa linkom ka sitemapu.</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td>Varijante adrese (http / https / www)</td>
+          <td>Pri proveri, zahtev ka www verziji završava na http adresi umesto na https. Ako sve četiri varijante odgovaraju, Google ih vidi kao četiri sajta i deli snagu između njih.</td>
+          <td>Jedna glavna adresa (<code>https://psihologbeograd.com</code>), 301 preusmerenje sa ostale tri, svuda isti oblik linkova.</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td>Nema canonical oznake</td>
+          <td>Ista strana može da se otvori na više adresa bez jasne naznake koja je prava.</td>
+          <td>Dodati <code>&lt;link rel="canonical"&gt;</code> na svaku stranu.</td>
+          <td><span class="pill p2">Srednji</span></td>
+        </tr>
+        <tr>
+          <td>Nema <code>lang</code> atributa</td>
+          <td>Google i čitači ekrana ne dobijaju potvrdu da je sadržaj na srpskom.</td>
+          <td><code>&lt;html lang="sr"&gt;</code>.</td>
+          <td><span class="pill p2">Srednji</span></td>
+        </tr>
+        <tr>
+          <td>Nema schema.org označavanja</td>
+          <td>Google ne razume da ste lokalna praksa sa adresom, radnim vremenom i telefonom. To je direktan ulaz u lokalne rezultate i mapu.</td>
+          <td>JSON-LD: <code>LocalBusiness</code> / <code>Psychologist</code>, <code>Person</code> za vas, kasnije <code>FAQPage</code> na stranama sa pitanjima.</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td>Nema Open Graph oznaka</td>
+          <td>Kada neko podeli link na Facebooku ili Vajberu, prikazuje se prazan pravougaonik bez slike i opisa. Deljenje je u ovoj niši čest kanal &mdash; ljudi šalju link prijatelju.</td>
+          <td>og:title, og:description, og:image (1200&times;630).</td>
+          <td><span class="pill p2">Srednji</span></td>
+        </tr>
+        <tr>
+          <td>Nema forme za zakazivanje</td>
+          <td>Deo ljudi koji traže psihologa neće da zove telefonom pri prvom kontaktu. Poziv je za njih prevelik prvi korak.</td>
+          <td>Kratka forma: ime, kontakt, uživo ili onlajn, nekoliko reči o temi. Tri do četiri polja, ne više.</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td>Nije potvrđena analitika</td>
+          <td>Bez Search Console i analitike ne postoji nijedan podatak o tome ko dolazi na sajt i preko čega.</td>
+          <td>Google Search Console + GA4 ili laka alternativa. Prvi korak u svakom poslu.</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td>Title i opis</td>
+          <td>Trenutni naslov je „Centar za lični rast i razvoj | Mirjana Antanasijević Milić“ &mdash; ime brenda, bez ijedne reči koju ljudi pretražuju.</td>
+          <td>Naslov koji sadrži uslugu i grad, npr. „Psiholog Beograd &mdash; savetovanje uživo i onlajn | Ajzenk“.</td>
+          <td><span class="pill p2">Srednji</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>3. Google poslovni profil &mdash; najbrža dobit</h2>
+
+  <p>Profil postoji: <strong>„Psiholog Beograd“</strong>, Dušana Petrovića Šaneta 4/31, Kaluđerica, ocena 5,0. Tu su i dva ozbiljna problema, oba rešiva bez ikakvog rada na sajtu.</p>
+
+  <h3>Kategorija je pogrešna</h3>
+  <p>Profil je u Google bazi vođen kao <em>obrazovna ustanova</em>. Svi konkurenti u Beogradu vođeni su kao <em>medicinska ordinacija / zdravstvo</em>. Kada neko u Beogradu pretražuje psihologa, Google bira iz zdravstvene kategorije &mdash; vaš profil u tom izboru ne učestvuje. Ovo je promena od deset minuta u Google panelu i verovatno najisplativija jedna stvar u celom auditu.</p>
+
+  <h3>Tri recenzije naspram trideset</h3>
+  <p>Imate tri recenzije. Evo šta imaju savetovališta sa kojima se takmičite:</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Savetovalište</th><th>Lokacija</th><th>Ocena</th><th>Broj recenzija</th></tr></thead>
+      <tbody>
+        <tr><td>Psiholog Beograd (Ajzenk)</td><td>Kaluđerica</td><td>5,0</td><td>3</td></tr>
+        <tr><td>Savetovalište Filipović</td><td>Voždovac</td><td>4,8</td><td>31</td></tr>
+        <tr><td>Mina Radosavljević</td><td>Zvezdara</td><td>4,5</td><td>30</td></tr>
+        <tr><td>Inspera, Cvijićeva</td><td>Palilula</td><td>4,6</td><td>29</td></tr>
+        <tr><td>PS Centar</td><td>Vračar</td><td>5,0</td><td>22</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Vaša ocena je najviša na listi, ali broj recenzija je ono što Google koristi kao signal, i ono što posetilac gleda prvo. Razlika od tri prema trideset je u lokalnim rezultatima presudna.</p>
+
+  <div class="note">
+    <h3>Kako tražiti recenzije u ovoj delatnosti</h3>
+    <p>Ovde ne može šablon koji koristi auto-servis. Klijent koji je bio kod psihologa često ne želi da se javno potpiše ispod toga, i to treba poštovati. Ono što radi: pitati na kraju završenog ciklusa, nikada usred procesa; jasno reći da recenzija može biti potpuno kratka i bez detalja; poslati direktan link da ne mora da traži profil. Nikakvih podsticaja, popusta ni poklona za recenziju &mdash; to je i protivno Google pravilima i pogrešan signal u ovoj niši.</p>
+    <p>Realan cilj: <strong>jedna do dve nove recenzije mesečno</strong>. Za godinu dana to vas izjednačava sa konkurencijom.</p>
+  </div>
+
+  <h3>Ime profila i ime na sajtu se razlikuju</h3>
+  <p>Na Google profilu stoji „Psiholog Beograd“, na sajtu „Centar za lični rast i razvoj AJZENK PR“. Google upoređuje naziv, adresu i telefon na svim mestima gde se pojavljujete. Kada se nazivi razlikuju, veza je slabija. Treba izabrati jedan oblik i koristiti ga svuda &mdash; na sajtu, na Google profilu, na Facebooku i u direktorijumima.</p>
+
+  <h2>4. Konkurencija: koliko teksta zaista treba</h2>
+
+  <p>Pogledali smo sajtove koji se trenutno pojavljuju na pretragama za koje biste vi hteli da se pojavljujete.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Sajt</th><th>Struktura</th><th>Cene</th><th>Dodatno</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>centarceres.com</td>
+          <td>Puna struktura: cene, tim sa šest terapeuta i zasebnim stranama, sedam strana usluga, tri pravca terapije, blog, dve lokacije</td>
+          <td>Da &mdash; 6.000 din individualno, 9.000 parovi, 4.000 grupno</td>
+          <td>Šest iskustava klijenata, strana na engleskom, dugme za zakazivanje</td>
+        </tr>
+        <tr>
+          <td>psiholognatalija.rs</td>
+          <td>Jedna strana, ali oko 800&ndash;1.000 reči, sa sekcijama i četiri članka</td>
+          <td>Da &mdash; 4.000 din, 40 € za klijente iz inostranstva</td>
+          <td>FAQ sa pet pitanja, besplatnih 15 minuta uvodnog razgovora, odgovor u roku od 24 sata</td>
+        </tr>
+        <tr>
+          <td>savetovalistefilipovic.rs</td>
+          <td>Savetovalište sa dodatnim programima i obukama</td>
+          <td>Delimično</td>
+          <td>31 recenzija, jaka lokalna prisutnost na Voždovcu</td>
+        </tr>
+        <tr>
+          <td><strong>psihologbeograd.com</strong></td>
+          <td><strong>Jedna strana, 185 reči</strong></td>
+          <td><strong>Ne</strong></td>
+          <td><strong>Nema forme, nema FAQ, nema iskustava</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Poenta nije da vam treba sajt kao kod Ceresa &mdash; oni su centar sa šest terapeuta. Poenta je da i samostalni psiholog sa jednom stranom drži 800 do 1.000 reči, cenu, FAQ i jasan prvi korak. To je ulaznica, a ne luksuz.</p>
+
+  <p class="quote">Najveća razlika nije u dizajnu. Razlika je u tome što kod konkurencije posetilac dobije odgovor na pitanja koja zaista ima: koliko košta, koliko traje, šta se dešava na prvom susretu, da li može onlajn, kada će mu neko odgovoriti.</p>
+
+  <h2>5. Kaluđerica nije prepreka &mdash; ako se igra na dve table</h2>
+
+  <p>Adresa je u Kaluđerici, što je formalno opština Grocka, a ne uže gradsko jezgro. U lokalnim rezultatima za „psiholog Beograd“ Google daje prednost onima koji su bliže centru pretrage. To je realno ograničenje i ne treba se pretvarati da ne postoji.</p>
+
+  <p>Postoje dva izlaza, i treba koristiti oba:</p>
+  <ul>
+    <li><strong>Lokalno, gde zaista možete da pobedite.</strong> Kaluđerica, Zvezdara, Mirijevo, Leštane, Vinča, Grocka, Boleč. Na pretrazi „psiholog Kaluđerica“ ili „psiholog Mirijevo“ konkurencije praktično nema. Ljudi iz tog dela grada traže nekoga ko im je blizu &mdash; i to ste vi.</li>
+    <li><strong>Onlajn, gde adresa ne znači ništa.</strong> Već radite onlajn seanse. Za pretragu „psiholog onlajn“ ili „savetovanje preko Zoom-a“ nije bitno gde je kancelarija. Tu se takmičite sa celom Srbijom, ali i sa srpskom dijasporom u Beču, Cirihu, Frankfurtu i Čikagu, koja traži psihologa koji govori njihov jezik. Taj segment plaća u evrima i skoro niko u Srbiji ga ne cilja ozbiljno.</li>
+  </ul>
+
+  <h2>6. Predlog nove strukture sajta</h2>
+
+  <p>Oko 20 strana, u pet grupa. Ne sve odjednom &mdash; redosled je u planu rada na kraju dokumenta.</p>
+
+  <h3>Usluge (7 strana)</h3>
+  <ul>
+    <li>Individualno psihološko savetovanje</li>
+    <li>Savetovanje parova</li>
+    <li>Savetovanje dece i adolescenata</li>
+    <li>Onlajn savetovanje</li>
+    <li>Procena ličnosti</li>
+    <li>Profesionalna orijentacija &mdash; izbor srednje škole i fakulteta</li>
+    <li>Priprema za intervju za posao</li>
+  </ul>
+
+  <h3>Teme sa kojima ljudi dolaze (6 strana)</h3>
+  <p>Ovo je najvredniji deo, jer ljudi retko traže „psihologa“ u apstraktnom smislu &mdash; traže rešenje za ono što ih muči.</p>
+  <ul>
+    <li>Anksioznost i napadi panike</li>
+    <li>Depresija i pad motivacije</li>
+    <li>Fobije</li>
+    <li>Samopouzdanje</li>
+    <li>Problemi u ljubavnim odnosima</li>
+    <li>Stres i izgaranje na poslu</li>
+  </ul>
+
+  <h3>Poverenje (4 strane)</h3>
+  <ul>
+    <li>O meni &mdash; obrazovanje, iskustvo, licenca, prava fotografija</li>
+    <li>Kako izgleda prvi susret &mdash; korak po korak, šta se dešava u tih sat vremena</li>
+    <li>Cena i način rada</li>
+    <li>Česta pitanja</li>
+  </ul>
+
+  <h3>Lokacija (3 strane)</h3>
+  <ul>
+    <li>Psiholog Kaluđerica</li>
+    <li>Psiholog Zvezdara / Mirijevo</li>
+    <li>Psiholog onlajn &mdash; za Srbiju i za dijasporu</li>
+  </ul>
+
+  <h3>Blog</h3>
+  <p>Dva teksta mesečno, pisana iz prakse, a ne prepričana sa Vikipedije. Teme koje ljudi zaista kucaju: kako prepoznati napad panike, kada je vreme da se potraži psiholog, razlika između psihologa, psihoterapeuta i psihijatra, kako razgovarati sa detetom o razvodu.</p>
+
+  <div class="note">
+    <h3>O ceni na sajtu</h3>
+    <p>Tema je osetljiva i odluka je vaša. Vredi znati kako stoje stvari na tržištu: konkurenti koji objavljuju cenu kreću se od 4.000 din po seansi kod samostalnih psihologa do 6.000 din u centrima, dok savetovanje parova ide oko 9.000 din.</p>
+    <p>Naše iskustvo je da objavljena cena smanjuje broj poziva, ali povećava broj dogovorenih termina &mdash; jer zove samo onaj kome cena odgovara. Ako ne želite tačan iznos, srednje rešenje je strana „Cena i način rada“ koja objašnjava trajanje, ritam susreta i način plaćanja, sa rasponom umesto fiksnog broja. Ono što ne preporučujemo ni u kom slučaju: reči „akcija“, „popust“, „najpovoljnije“ i poređenje cena sa konkurencijom. U ovoj delatnosti to odbija upravo onu vrstu klijenta koju želite.</p>
+  </div>
+
+  <div class="note">
+    <h3>Ton i granice u tekstovima</h3>
+    <p>Sve što se piše za sajt psihologa prolazi kroz dva filtera. Prvi je stručni: vi ste diplomirani psiholog i radite savetovanje &mdash; tekstovi govore o savetovanju, ne o psihoterapiji i ne o lečenju, i ne obećavaju ishod. Drugi je ljudski: čovek koji ovo čita najčešće nije u dobrom stanju. Tekst koji počinje prodajnim tonom gubi ga u prvoj rečenici.</p>
+    <p>Praktično: nikakve garancije rezultata, nikakva dijagnostika na sajtu, nikakva statistika o „procentu uspešnosti“. Umesto toga &mdash; jasno objašnjenje šta se dešava na prvom susretu i koliko to traje. Svaki tekst pre objave ide vama na proveru.</p>
+  </div>
+
+  <h2>7. Šta dobijate radom sa nama</h2>
+
+  <p>Ovaj deo je konkretno o tome šta se menja za vas, mesec po mesec, i zašto to vredi.</p>
+
+  <div class="gain">
+    <div>
+      <h3>Upiti koji dolaze sami, bez oglasa</h3>
+      <p>Plaćeni oglas prestaje da radi istog dana kada prestanete da plaćate. Strana koja je ušla u rezultate pretrage donosi upite i godinu dana kasnije, bez dodatnog troška. Za praksu koja se oslanja na stalan priliv novih klijenata to je razlika između mirnog i nervoznog meseca.</p>
+    </div>
+    <div>
+      <h3>Klijent koji dolazi spremniji</h3>
+      <p>Čovek koji je pre poziva pročitao kako izgleda prvi susret, koliko traje i šta košta, dolazi odlučen. Manje otkazanih termina, manje poziva koji se završe sa „razmisliću“, manje vremena potrošenog na objašnjavanje osnovnih stvari telefonom.</p>
+    </div>
+    <div>
+      <h3>Pristup tržištu koje danas uopšte ne vidite</h3>
+      <p>Onlajn seanse već radite, ali vas niko ko vas ne poznaje ne može naći. Srpska dijaspora traži psihologa koji govori maternji jezik i plaća u evrima. Ovo je segment koji se otvara jednom stranom i par tekstova, bez ijednog dodatnog troška u kancelariji.</p>
+    </div>
+    <div>
+      <h3>Lokalni rezultati gde konkurencije nema</h3>
+      <p>Ispravka kategorije na Google profilu i tri lokalne strane stavljaju vas u mapu za ceo istočni deo grada. Tu se takmičite sa dva ili tri imena, a ne sa trideset savetovališta iz centra.</p>
+    </div>
+    <div>
+      <h3>Brojke umesto osećaja</h3>
+      <p>Svakog meseca dobijate izveštaj: koliko ljudi je došlo na sajt, sa kojih pretraga, koliko ih je popunilo formu ili pozvalo. Kada se nešto ne isplati, videćete to iz podataka, a ne posle šest meseci.</p>
+    </div>
+    <div>
+      <h3>Sadržaj ostaje vaš</h3>
+      <p>Strane, tekstovi, fotografije i tehnička postavka ostaju na vašem domenu i posle završetka saradnje. Ne iznajmljujete rezultat &mdash; gradite imovinu.</p>
+    </div>
+  </div>
+
+  <h3>Realan opseg rezultata za tri meseca</h3>
+  <p>Bez ulepšavanja. Tri meseca su dovoljna da se sajt od jedne strane pretvori u sajt od dvadesetak strana, da se sve tehnički postavi kako treba i da se pojave prvi upiti iz pretrage. Nisu dovoljna da se osvoje najkonkurentnije reči &mdash; za to treba duže i to niko pošten neće obećati za tri meseca.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Period</th><th>Šta se radi</th><th>Šta se vidi na kraju meseca</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>1. mesec</strong></td>
+          <td>Tehnička postavka, Google profil, prvih sedam strana usluga, forma za zakazivanje, prave fotografije</td>
+          <td>Profil se pojavljuje u mapi za istočni deo grada; sajt je u indeksu sa osam strana umesto jedne; forma radi i stižu prvi upiti preko nje</td>
+        </tr>
+        <tr>
+          <td><strong>2. mesec</strong></td>
+          <td>Strane poverenja (prvi susret, o meni, cena, FAQ), šest strana po temama, početak prikupljanja recenzija</td>
+          <td>Prve pozicije na uskim pretragama („psiholog Kaluđerica“, „procena ličnosti Beograd“); poseta iz pretrage merljivo raste u odnosu na nulu</td>
+        </tr>
+        <tr>
+          <td><strong>3. mesec</strong></td>
+          <td>Tri lokalne strane, interno povezivanje, FAQ označavanje, prva dva teksta, upis u direktorijume, izveštaj</td>
+          <td>Stalan priliv upita sa desetak do dvadesetak pretraga; jasna slika u brojkama šta donosi upite, a šta ne</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Šta ne obećavamo u ovom roku: prvo mesto za „psiholog Beograd“. Tu su sajtovi sa godinama istorije i desetinama strana, i tri meseca nisu dovoljna. Ono što se u tri meseca postiže jeste da sajt uopšte počne da donosi upite &mdash; sa užih pretraga, sa lokalnih i preko Google profila. Posle toga se nastavlja rad na širim rečima, i to je razgovor za kraj trećeg meseca, kada postoje stvarni podaci.</p>
+
+  <h2>8. Plan rada: tri meseca, po nedeljama</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Rok</th><th>Sadržaj</th><th>Trud</th><th>Efekat</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>1&ndash;2. nedelja</strong></td>
+          <td>Search Console i analitika; sitemap i robots; 301 na jednu adresu; canonical i lang; schema LocalBusiness; Open Graph; ispravka kategorije na Google profilu; usklađivanje naziva, adrese i telefona svuda</td>
+          <td>Mali</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td><strong>3&ndash;4. nedelja</strong></td>
+          <td>Forma za zakazivanje; prave fotografije vas i prostora; sedam strana usluga napisano i objavljeno; novi naslovi i opisi</td>
+          <td>Srednji</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td><strong>5&ndash;8. nedelja</strong></td>
+          <td>„Kako izgleda prvi susret“; „O meni“ sa licencom; strana o ceni i načinu rada; FAQ; iskustva klijenata; šest strana po temama; kreće prikupljanje recenzija</td>
+          <td>Srednji</td>
+          <td><span class="pill p1">Visok</span></td>
+        </tr>
+        <tr>
+          <td><strong>9&ndash;12. nedelja</strong></td>
+          <td>Tri lokalne strane; interno povezivanje svih strana; FAQPage označavanje; upis u relevantne direktorijume; prva dva teksta na blogu; izveštaj i plan za dalje</td>
+          <td>Srednji</td>
+          <td><span class="pill p2">Srednji</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Rokovi važe pod jednim uslovom: tekstovi za strane usluga i tema idu vama na proveru, pa od brzine te povratne informacije zavisi da li se sve uklapa u nedelju ili klizne za sedam dana. Fotografije su druga tačka koja ume da zaustavi posao &mdash; njih vredi uraditi u prve dve nedelje.</p>
+
+  <h2>9. Šta pratimo</h2>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Pokazatelj</th><th>Danas</th><th>Kraj 1. meseca</th><th>Kraj 2. meseca</th><th>Kraj 3. meseca</th></tr></thead>
+      <tbody>
+        <tr><td>Strana u indeksu</td><td>1</td><td>8&ndash;9</td><td>15&ndash;17</td><td>20&ndash;22</td></tr>
+        <tr><td>Pretrage sa kojih dolazi poseta</td><td>svega nekoliko, uglavnom po imenu</td><td>5&ndash;15</td><td>25&ndash;40</td><td>50&ndash;80</td></tr>
+        <tr><td>Google recenzije</td><td>3</td><td>4&ndash;5</td><td>6&ndash;7</td><td>8&ndash;9</td></tr>
+        <tr><td>Upiti preko forme</td><td>forma ne postoji</td><td>1&ndash;3</td><td>3&ndash;6</td><td>5&ndash;10 mesečno</td></tr>
+        <tr><td>Pozivi sa Google profila</td><td>ne meri se</td><td>merenje uspostavljeno</td><td>prva poređenja</td><td>rast vidljiv u izveštaju</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Brojke u kolonama za ciljeve su procena zasnovana na veličini niše u Beogradu i na tome koliko sadržaja imaju konkurenti. Prve stvarne podatke iz Search Console imamo posle šeste nedelje &mdash; tada se ciljevi za treći mesec koriguju naviše ili naniže, prema onome što se zaista dešava.</p>
+
+  <h2>Prvi korak</h2>
+  <p>Prve dve nedelje ne zahtevaju nikakvu odluku o sadržaju &mdash; to je čista tehnika. Ispravka kategorije na Google poslovnom profilu može da se uradi odmah, danas, i sama po sebi menja to da li vas Beograd uopšte vidi u lokalnim rezultatima.</p>
+
+  <footer>
+    SEO audit sajta psihologbeograd.com &middot; 23. oktobar 2026.<br>
+    Izvori podataka: sadržaj sajta, Google poslovni profil, javno dostupni sajtovi i cenovnici konkurenata.
+  </footer>
+
+</div>
